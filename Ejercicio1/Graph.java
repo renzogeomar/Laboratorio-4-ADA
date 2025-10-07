@@ -1,14 +1,15 @@
 package Ejercicio1;
 import java.util.Random;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Graph {
     private List<Node> nodes;
     private List<Edge> edges;
 
-    public Graph(List<Node> nodes, List<Edge> edges) {
-        this.nodes = nodes;
-        this.edges = edges;
+    public Graph() {
+        nodes = new ArrayList<>();
+        edges = new ArrayList<>();
     }
 
     public void addNode(String name) {
