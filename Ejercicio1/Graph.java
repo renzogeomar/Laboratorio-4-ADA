@@ -45,6 +45,7 @@ public class Graph {
 
         edges.add(new Edge(n1, n2, weight));
 
+
     }
 
     public Node getNode(String name) {
@@ -70,10 +71,10 @@ public class Graph {
 
         // Crear los nodos
         for (int i = 0; i < cantidadNodos; i++) {
-            addNode("N" + i); // los nombres serán N0, N1, N2...
+            addNode("N" + i); // N0, N1, N2...
         }
 
-        // Crear las aristas
+        // Crear las aristas aleatorias
         int totalIntentos = 0;
         while (edges.size() < cantidadAristas && totalIntentos < cantidadAristas * 5) {
             int i = rand.nextInt(cantidadNodos);
@@ -87,54 +88,57 @@ public class Graph {
             Node from = getNode("N" + i);
             Node to = getNode("N" + j);
 
-            // evitar duplicados 
-            boolean existe = false;
-            for (Edge e : edges) {
-                if (e.getFrom().equals(from) && e.getTo().equals(to)) {
-                    existe = true;
-                    break;
-                }
-            }
+            // (Si quieres permitir múltiples aristas, no verifiques duplicados)
+            int peso = ponderado ? (rand.nextInt(9) + 1) : 0; // peso aleatorio 1–9
+            addEdge(from.getName(), to.getName(), peso);
 
-            if (!existe) {
-                int peso = ponderado ? (rand.nextInt(9) + 1) : 0; // peso aleatorio 1–9
-                addEdge(from.getName(), to.getName(), peso);
-            }
             totalIntentos++;
         }
     }
 
     public void prim(String startName) {
-        Node start = getNode(startName); // buscar el nodo inicial
+        Node start = getNode(startName);
         if (start == null) {
             System.out.println("El nodo inicial no existe.");
             return;
         }
 
-        List<Node> visited = new ArrayList<>(); // nodos ya incluidos en el MST
-        List<Edge> mst = new ArrayList<>(); // aristas del MST
+        List<Node> visited = new ArrayList<>();
+        List<Edge> mst = new ArrayList<>();
 
         visited.add(start);
 
-        while (visited.size() < nodes.size()) { // mientras no se hayan visitado todos los nodos
-            Edge minEdge = null; // arista mínima encontrada
+        while (visited.size() < nodes.size()) {
+            Edge minEdge = null;
 
             // Buscar la arista más pequeña que conecte un nodo visitado con uno no visitado
-            for (Edge e : edges) { // recorrer todas las aristas
-                if (visited.contains(e.getFrom()) && !visited.contains(e.getTo())) { // conecta visitado con no visitado
-                    if (minEdge == null || e.getWeight() < minEdge.getWeight()) { // es la más pequeña hasta ahora
-                        minEdge = e; // actualizar la mínima
+            for (Edge e : edges) {
+                Node from = e.getFrom();
+                Node to = e.getTo();
+                int weight = e.getWeight();
+
+                if ((visited.contains(from) && !visited.contains(to)) ||
+                    (visited.contains(to) && !visited.contains(from))) {
+
+                    if (minEdge == null || weight < minEdge.getWeight()) {
+                        minEdge = e;
                     }
                 }
             }
 
-            if (minEdge == null) { // no se encontró ninguna arista válida
+            if (minEdge == null) {
                 System.out.println("El grafo no es conexo. No se puede generar MST completo.");
                 break;
             }
 
-            mst.add(minEdge); // agregar la arista al MST
-            visited.add(minEdge.getTo()); // marcar el nodo destino como visitado
+            mst.add(minEdge);
+
+            // Añadir el nodo no visitado
+            if (visited.contains(minEdge.getFrom()) && !visited.contains(minEdge.getTo())) {
+                visited.add(minEdge.getTo());
+            } else {
+                visited.add(minEdge.getFrom());
+            }
         }
 
         // Mostrar el MST
