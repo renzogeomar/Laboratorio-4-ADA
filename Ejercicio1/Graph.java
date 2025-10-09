@@ -44,7 +44,6 @@ public class Graph {
         }
 
         edges.add(new Edge(n1, n2, weight));
-        edges.add(new Edge(n2, n1, weight)); //arista inversa para grafo no dirigido
 
     }
 
@@ -103,5 +102,48 @@ public class Graph {
             }
             totalIntentos++;
         }
+    }
+
+    public void prim(String startName) {
+        Node start = getNode(startName); // buscar el nodo inicial
+        if (start == null) {
+            System.out.println("El nodo inicial no existe.");
+            return;
+        }
+
+        List<Node> visited = new ArrayList<>(); // nodos ya incluidos en el MST
+        List<Edge> mst = new ArrayList<>(); // aristas del MST
+
+        visited.add(start);
+
+        while (visited.size() < nodes.size()) { // mientras no se hayan visitado todos los nodos
+            Edge minEdge = null; // arista mínima encontrada
+
+            // Buscar la arista más pequeña que conecte un nodo visitado con uno no visitado
+            for (Edge e : edges) { // recorrer todas las aristas
+                if (visited.contains(e.getFrom()) && !visited.contains(e.getTo())) { // conecta visitado con no visitado
+                    if (minEdge == null || e.getWeight() < minEdge.getWeight()) { // es la más pequeña hasta ahora
+                        minEdge = e; // actualizar la mínima
+                    }
+                }
+            }
+
+            if (minEdge == null) { // no se encontró ninguna arista válida
+                System.out.println("El grafo no es conexo. No se puede generar MST completo.");
+                break;
+            }
+
+            mst.add(minEdge); // agregar la arista al MST
+            visited.add(minEdge.getTo()); // marcar el nodo destino como visitado
+        }
+
+        // Mostrar el MST
+        System.out.println("\nÁrbol de expansión mínima (Prim):");
+        int pesoTotal = 0;
+        for (Edge e : mst) {
+            System.out.println(" - " + e);
+            pesoTotal += e.getWeight();
+        }
+        System.out.println("Peso total del árbol: " + pesoTotal);
     }
 }

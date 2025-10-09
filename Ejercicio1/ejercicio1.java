@@ -5,6 +5,7 @@ public class ejercicio1 {
         Graph graph = new Graph();
         graph.generarGrafoAleatorio(6, 10, true);
         graph.showGraph();
+        graph.prim("N0");
     }
 
 
