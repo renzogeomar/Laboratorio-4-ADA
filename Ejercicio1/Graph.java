@@ -12,6 +12,15 @@ public class Graph {
         edges = new ArrayList<>();
     }
 
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+
     public void addNode(String name) {
         Node node = new Node(name);
         if (!nodes.contains(node)) {
@@ -26,10 +35,20 @@ public class Graph {
             System.out.println("Uno de los nodos no existe.");
             return;
         }
+
+        // Evitar duplicados
+        for (Edge e : edges) {
+            if (e.getFrom().equals(n1) && e.getTo().equals(n2)) {
+                return;
+            }
+        }
+
         edges.add(new Edge(n1, n2, weight));
+        edges.add(new Edge(n2, n1, weight)); //arista inversa para grafo no dirigido
+
     }
 
-    private Node getNode(String name) {
+    public Node getNode(String name) {
         for (Node n : nodes) {
             if (n.getName().equals(name)) return n;
         }
