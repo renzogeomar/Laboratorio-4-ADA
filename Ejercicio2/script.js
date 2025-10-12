@@ -47,3 +47,69 @@ class Edge {
     }
 }
 
+// ESTRUCTURA DE DATOS UNION-FIND (para Kruskal) ---
+class UnionFind { // Mantiene conjuntos disjuntos de nodos
+    constructor(nodes) {
+        this.parent = new Map(); // Mapa de padres para cada nodo
+        nodes.forEach(node => this.parent.set(node.name, node.name)); // Inicialmente, cada nodo es su propio padre
+    }
+
+    // Encuentra el representante (raíz) del conjunto al que pertenece un nodo
+    find(nodeName) {
+        if (this.parent.get(nodeName) === nodeName) { // Es la raíz
+            return nodeName;
+        }
+        // Compresión de ruta para optimizar
+        const root = this.find(this.parent.get(nodeName)); // Recursión para encontrar la raíz
+        this.parent.set(nodeName, root); // Actualiza el padre directo al root
+        return root;
+    }
+
+    // Une los conjuntos de dos nodos
+    union(nodeName1, nodeName2) {
+        const root1 = this.find(nodeName1); // Encuentra la raíz del primer nodo
+        const root2 = this.find(nodeName2); // Encuentra la raíz del segundo nodo
+        if (root1 !== root2) {
+            this.parent.set(root2, root1);
+            return true; // Unión exitosa
+        }
+        return false; // Ya estaban en el mismo conjunto
+    }
+}
+
+
+// --- LÓGICA DEL GRAFO ---
+function generarGrafoAleatorio() {
+    const cantidadNodos = parseInt(nodeCountInput.value);
+    const cantidadAristas = parseInt(edgeCountInput.value);
+    
+    nodes = [];
+    edges = [];
+    activeAlgorithm = null;
+    
+    for (let i = 0; i < cantidadNodos; i++) {
+        const x = Math.random() * (canvas.width - 60) + 30;
+        const y = Math.random() * (canvas.height - 60) + 30;
+        nodes.push(new Node('N' + i, x, y));
+    }
+
+    const edgeSet = new Set();
+    while (edges.length < cantidadAristas && edges.length < (cantidadNodos * (cantidadNodos - 1)) / 2) {
+        let i = Math.floor(Math.random() * cantidadNodos);
+        let j = Math.floor(Math.random() * cantidadNodos);
+        if (i === j) continue;
+        const edgeKey = i < j ? `${i}-${j}` : `${j}-${i}`;
+        if (edgeSet.has(edgeKey)) continue;
+        const weight = Math.floor(Math.random() * 20) + 1;
+        edges.push(new Edge(nodes[i], nodes[j], weight));
+        edgeSet.add(edgeKey);
+    }
+    
+    resetGraphColors();
+    drawGraph();
+    logMessage('Grafo aleatorio generado.', true);
+    btnRunPrim.disabled = false;
+    btnRunKruskal.disabled = false;
+    btnNext.disabled = true;
+}
+
