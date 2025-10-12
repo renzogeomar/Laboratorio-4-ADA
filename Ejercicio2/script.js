@@ -152,3 +152,80 @@ function siguientePaso() { // Ejecuta el siguiente paso del algoritmo activo
     }
 }
 
+// ALGORITMO DE PRIM 
+function iniciarPrim() {
+    const startNode = nodes[0];
+    
+    algorithmState = { // Estado inicial del algoritmo
+        visited: new Set([startNode]),
+        mst: [],
+        availableEdges: [],
+        isFinished: false,
+    };
+    
+    startNode.color = COLORS.NODE_MST;
+    
+    edges.forEach(edge => { // Añadir aristas conectadas al nodo inicial
+        if (edge.from === startNode || edge.to === startNode) { // Conectada al nodo inicial
+            algorithmState.availableEdges.push(edge); // Añadir a aristas disponibles
+            edge.color = COLORS.EDGE_CANDIDATE;
+        }
+    });
+
+    logMessage(`Empezando desde el nodo ${startNode.name}.`);
+}
+
+function siguientePasoPrim() {
+    if (algorithmState.isFinished) return;
+
+    let minEdge = null;
+    let minWeight = Infinity;
+    
+    algorithmState.availableEdges.forEach(edge => { // Buscar la arista de menor peso que conecta un nodo visitado con uno no visitado
+        const fromVisited = algorithmState.visited.has(edge.from); // Nodo de origen visitado
+        const toVisited = algorithmState.visited.has(edge.to); // Nodo de destino visitado  
+        if ((fromVisited && !toVisited) || (!fromVisited && toVisited)) { // Conecta un nodo visitado con uno no visitado
+            if (edge.weight < minWeight) { // Encontrar la arista de menor peso
+                minWeight = edge.weight;
+                minEdge = edge;
+            }
+        }
+    });
+
+    if (minEdge === null) { // No hay aristas disponibles que conecten nodos visitados con no visitados
+        algorithmState.isFinished = true;
+        logMessage("No se encontraron más aristas. El grafo podría no ser conexo.");
+        btnNext.disabled = true;
+        drawGraph();
+        return;
+    }
+    
+    minEdge.color = COLORS.EDGE_MST;
+    algorithmState.mst.push(minEdge);
+
+    const newNode = algorithmState.visited.has(minEdge.from) ? minEdge.to : minEdge.from; // Nodo nuevo añadido al MST
+    newNode.color = COLORS.NODE_MST;
+    algorithmState.visited.add(newNode);
+    
+    logMessage(`Arista ${minEdge.from.name}-${minEdge.to.name} (Peso: ${minEdge.weight}) añadida.`);
+
+    algorithmState.availableEdges = algorithmState.availableEdges.filter(e => e !== minEdge);
+    
+    edges.forEach(edge => { // Añadir nuevas aristas conectadas al nuevo nodo
+        if ((edge.from === newNode && !algorithmState.visited.has(edge.to)) || 
+            (edge.to === newNode && !algorithmState.visited.has(edge.from))) {
+            algorithmState.availableEdges.push(edge);
+            if(edge.color !== COLORS.EDGE_MST) edge.color = COLORS.EDGE_CANDIDATE;
+        } // Conectada al nuevo nodo y al menos un extremo no visitado
+    });
+
+    drawGraph();
+    
+    if (algorithmState.visited.size === nodes.length) { // Todos los nodos han sido visitados
+        algorithmState.isFinished = true;
+        btnNext.disabled = true;
+        const totalWeight = algorithmState.mst.reduce((sum, edge) => sum + edge.weight, 0);
+        logMessage(`¡MST completo! Peso total: ${totalWeight}`);
+    }
+}
+
