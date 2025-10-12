@@ -1,6 +1,4 @@
-import java.util.Random;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Graph {
     private List<Node> nodes;
@@ -103,14 +101,14 @@ public class Graph {
         }
 
         int n = nodes.size();
-        int[][] matriz = new int[n][n]; // Matriz de adyacencia (0 = sin conexión)
+        int[][] matriz = new int[n][n]; // Matriz de adyacencia (0 = sin conexion)
 
-        // Llenar la matriz con los pesos
+        // llenar la matriz con los pesos
         for (Edge e : edges) {
             int i = nodes.indexOf(e.getFrom());
             int j = nodes.indexOf(e.getTo());
             matriz[i][j] = e.getWeight();
-            matriz[j][i] = e.getWeight(); // porque es no dirigido
+            matriz[j][i] = e.getWeight();
         }
 
         boolean[] visitado = new boolean[n];
@@ -194,6 +192,58 @@ public class Graph {
             }
             System.out.println();
         }
+    }
+
+    public void primLista(String startName) {
+        Node start = getNode(startName);
+        if (start == null) {
+            System.out.println("El nodo inicial no existe.");
+            return;
+        }
+
+        Map<Node, List<Edge>> listaAdyacencia = new HashMap<>();
+
+        // Construir lista de adyacencia
+        for (Edge e : edges) {
+            listaAdyacencia.computeIfAbsent(e.getFrom(), k -> new ArrayList<>()).add(e);
+            listaAdyacencia.computeIfAbsent(e.getTo(), k -> new ArrayList<>())
+                .add(new Edge(e.getTo(), e.getFrom(), e.getWeight())); // arista opuesta
+        }
+
+        Set<Node> visitados = new HashSet<>();
+        PriorityQueue<Edge> cola = new PriorityQueue<>();
+
+        visitados.add(start);
+        List<Edge> adyacentesStart = listaAdyacencia.get(start);
+        if (adyacentesStart != null)
+            cola.addAll(adyacentesStart);
+
+        List<Edge> mst = new ArrayList<>();
+        int pesoTotal = 0;
+
+        while (!cola.isEmpty() && mst.size() < nodes.size() - 1) {
+            Edge menor = cola.poll();
+            if (visitados.contains(menor.getTo())) continue;
+
+            visitados.add(menor.getTo());
+            mst.add(menor);
+            pesoTotal += menor.getWeight();
+
+            List<Edge> adyacentes = listaAdyacencia.get(menor.getTo());
+            if (adyacentes != null) {
+                for (Edge vecino : adyacentes) {
+                    if (!visitados.contains(vecino.getTo())) {
+                        cola.add(vecino);
+                    }
+                }
+            }
+        }
+
+        System.out.println("\nÁrbol de expansión mínima (Prim con lista):");
+        for (Edge e : mst) {
+            System.out.println(" - " + e.getFrom() + " --(" + e.getWeight() + ")--> " + e.getTo());
+        }
+        System.out.println("Peso total del árbol: " + pesoTotal);
     }
 
 

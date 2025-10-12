@@ -1,4 +1,4 @@
-public class Edge {
+public class Edge implements Comparable<Edge>{
     private Node from;
     private Node to;
     private int weight;
@@ -19,6 +19,13 @@ public class Edge {
 
     public int getWeight() {
         return weight;
+    }
+
+    @Override
+    public int compareTo(Edge otra) {
+        if (this.weight < otra.weight) return -1;
+        else if (this.weight > otra.weight) return 1;
+        else return 0;
     }
 
     @Override
