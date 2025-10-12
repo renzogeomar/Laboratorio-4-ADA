@@ -229,3 +229,84 @@ function siguientePasoPrim() {
     }
 }
 
+// ALGORITMO DE KRUSKAL 
+function iniciarKruskal() {
+    const sortedEdges = [...edges].sort((a, b) => a.weight - b.weight); // Ordenar aristas por peso ascendente
+    
+    algorithmState = { // Estado inicial del algoritmo
+        mst: [],
+        dsu: new UnionFind(nodes), // Estructura Union-Find para ciclos
+        sortedEdges: sortedEdges,
+        edgeIndex: 0,
+        isFinished: false
+    };
+    
+    logMessage('Aristas ordenadas por peso. Evaluando la primera arista.');
+    // Pintar la primera arista como "en consideración"
+    if (algorithmState.sortedEdges.length > 0) { // Si hay aristas
+        algorithmState.sortedEdges[0].color = COLORS.EDGE_CONSIDERING;
+    }
+}
+
+function siguientePasoKruskal() {
+    if (algorithmState.isFinished) return;
+
+    const edgeIndex = algorithmState.edgeIndex;
+    if (edgeIndex >= algorithmState.sortedEdges.length) { // Todas las aristas han sido evaluadas
+        algorithmState.isFinished = true;
+        logMessage("Todas las aristas han sido evaluadas.");
+        finalizarKruskal();
+        return;
+    }
+    
+    // Devolver el color de la arista anterior a su estado (si no fue MST)
+    if (edgeIndex > 0) { // No es la primera arista
+        const prevEdge = algorithmState.sortedEdges[edgeIndex - 1];
+        if (prevEdge.color !== COLORS.EDGE_MST) { // Si no fue añadida al MST
+            prevEdge.color = COLORS.EDGE_DISCARDED;
+        }
+    }
+
+    const currentEdge = algorithmState.sortedEdges[edgeIndex]; // Arista actual a evaluar
+    currentEdge.color = COLORS.EDGE_CONSIDERING;
+    
+    logMessage(`Evaluando arista ${currentEdge.from.name}-${currentEdge.to.name} (Peso: ${currentEdge.weight})...`);
+
+    const root1 = algorithmState.dsu.find(currentEdge.from.name);
+    const root2 = algorithmState.dsu.find(currentEdge.to.name);
+
+    if (root1 !== root2) { // No forma ciclo
+        logMessage('  -> No forma ciclo. Añadiendo al MST.');
+        algorithmState.dsu.union(currentEdge.from.name, currentEdge.to.name);
+        algorithmState.mst.push(currentEdge);
+        currentEdge.color = COLORS.EDGE_MST;
+        currentEdge.from.color = COLORS.NODE_MST;
+        currentEdge.to.color = COLORS.NODE_MST;
+    } else {
+        logMessage('  -> Forma un ciclo. Descartando.');
+        // Se coloreará como descartada en el siguiente paso
+    }
+    
+    algorithmState.edgeIndex++;
+    
+    drawGraph();
+
+    if (algorithmState.mst.length === nodes.length - 1) { // MST completo
+        algorithmState.isFinished = true;
+        logMessage("MST completo encontrado.");
+        finalizarKruskal();
+    }
+}
+
+function finalizarKruskal() {
+    // Colorear las aristas no usadas como descartadas
+    algorithmState.sortedEdges.forEach(e => {
+        if(e.color !== COLORS.EDGE_MST) e.color = COLORS.EDGE_DEFAULT;
+    }); // Resetear color de aristas no usadas
+    const totalWeight = algorithmState.mst.reduce((sum, edge) => sum + edge.weight, 0);
+    logMessage(`Peso total del MST: ${totalWeight}`);
+    btnNext.disabled = true;
+    drawGraph();
+}
+
+
