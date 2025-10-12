@@ -2,6 +2,7 @@ package Ejercicio3;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 public class Graph {
     private List<Node> nodes;
@@ -144,6 +145,51 @@ public class Graph {
         // Mostrar el MST
         System.out.println("\nÁrbol de expansión mínima (Prim):");
         int pesoTotal = 0;
+        for (Edge e : mst) {
+            System.out.println(" - " + e);
+            pesoTotal += e.getWeight();
+        }
+        System.out.println("Peso total del árbol: " + pesoTotal);
+    }
+
+    public void kruskal() {
+        // 1. Crear una lista de aristas y ordenarla por peso
+        List<Edge> sortedEdges = new ArrayList<>(edges);
+        sortedEdges.sort(Comparator.comparingInt(Edge::getWeight));
+
+        // Lista para almacenar el Árbol de Expansión Mínima (MST)
+        List<Edge> mst = new ArrayList<>();
+        
+        // 2. Inicializar la estructura Union-Find con todos los nodos del grafo
+        UnionFind uf = new UnionFind(nodes);
+
+        // 3. Recorrer las aristas ordenadas
+        for (Edge edge : sortedEdges) {
+            Node from = edge.getFrom();
+            Node to = edge.getTo();
+
+            // 4. Comprobar si añadir la arista forma un ciclo
+            // Esto se hace verificando si los nodos 'from' y 'to' ya están en el mismo conjunto.
+            if (uf.find(from) != uf.find(to)) {
+                // Si no forman un ciclo, añadir la arista al MST
+                mst.add(edge);
+                // Unir los conjuntos de los dos nodos
+                uf.union(from, to);
+            }
+
+            // Opcional: El algoritmo puede parar cuando el MST esté completo
+            if (mst.size() == nodes.size() - 1) {
+                break;
+            }
+        }
+
+        // 5. Mostrar el resultado del MST
+        System.out.println("\nÁrbol de expansión mínima (Kruskal):");
+        int pesoTotal = 0;
+        if (mst.size() < nodes.size() - 1) {
+            System.out.println("El grafo no es conexo. No se pudo generar un MST completo.");
+        }
+        
         for (Edge e : mst) {
             System.out.println(" - " + e);
             pesoTotal += e.getWeight();
