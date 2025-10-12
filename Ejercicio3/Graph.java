@@ -97,62 +97,67 @@ public class Graph {
         }
     }
 
-    public void prim(String startName) {
+    private void printMSTResult(String algorithmName, List<Edge> mst) { // Nuevo método para imprimir resultados
+        System.out.println("\nÁrbol de expansión mínima (" + algorithmName + "):");
+        int totalWeight = 0;
+
+        if (mst.size() < nodes.size() - 1 && !nodes.isEmpty()) {
+            System.out.println("El grafo no es conexo. No se pudo generar un MST completo.");
+        }
+
+        for (Edge e : mst) {
+            // System.out.println(" - " + e); // Opcional: imprimir cada arista
+            totalWeight += e.getWeight();
+        }
+        System.out.println("Peso total del árbol: " + totalWeight);
+    }
+
+    public List<Edge> prim(String startName) {
         Node start = getNode(startName);
         if (start == null) {
             System.out.println("El nodo inicial no existe.");
-            return;
+            return new ArrayList<>(); // Devuelve lista vacía si hay error
         }
 
-        List<Node> visited = new ArrayList<>();
-        List<Edge> mst = new ArrayList<>();
+        List<Node> visited = new ArrayList<>(); // nodos visitados
+        List<Edge> mst = new ArrayList<>(); // aristas del árbol de expansión mínima
 
         visited.add(start);
 
-        while (visited.size() < nodes.size()) {
+        while (visited.size() < nodes.size()) { // mientras no se hayan visitado todos los nodos
             Edge minEdge = null;
-
-            // Buscar la arista más pequeña que conecte un nodo visitado con uno no visitado
             for (Edge e : edges) {
-                Node from = e.getFrom();
-                Node to = e.getTo();
-                int weight = e.getWeight();
+                boolean fromVisited = visited.contains(e.getFrom()); // si el nodo de origen ya fue visitado
+                boolean toVisited = visited.contains(e.getTo()); // si el nodo de destino ya fue visitado
 
-                if ((visited.contains(from) && !visited.contains(to)) ||
-                    (visited.contains(to) && !visited.contains(from))) {
-
-                    if (minEdge == null || weight < minEdge.getWeight()) {
+                if (fromVisited && !toVisited || !fromVisited && toVisited) { // si uno de los nodos fue visitado y el otro no
+                    if (minEdge == null || e.getWeight() < minEdge.getWeight()) { // si es la arista de menor peso encontrada
                         minEdge = e;
                     }
                 }
             }
 
             if (minEdge == null) {
-                System.out.println("El grafo no es conexo. No se puede generar MST completo.");
-                break;
+                break; // Grafo no conexo
             }
 
             mst.add(minEdge);
 
-            // Añadir el nodo no visitado
-            if (visited.contains(minEdge.getFrom()) && !visited.contains(minEdge.getTo())) {
+            if (!visited.contains(minEdge.getTo())) {
                 visited.add(minEdge.getTo());
-            } else {
+            } 
+            else {
                 visited.add(minEdge.getFrom());
             }
         }
 
-        // Mostrar el MST
-        System.out.println("\nÁrbol de expansión mínima (Prim):");
-        int pesoTotal = 0;
-        for (Edge e : mst) {
-            System.out.println(" - " + e);
-            pesoTotal += e.getWeight();
-        }
-        System.out.println("Peso total del árbol: " + pesoTotal);
+        printMSTResult("Prim", mst);
+        return mst;
+
+
     }
 
-    public void kruskal() {
+    public List<Edge> kruskal() {
         // 1. Crear una lista de aristas y ordenarla por peso
         List<Edge> sortedEdges = new ArrayList<>(edges);
         sortedEdges.sort(Comparator.comparingInt(Edge::getWeight));
@@ -183,17 +188,9 @@ public class Graph {
             }
         }
 
-        // 5. Mostrar el resultado del MST
-        System.out.println("\nÁrbol de expansión mínima (Kruskal):");
-        int pesoTotal = 0;
-        if (mst.size() < nodes.size() - 1) {
-            System.out.println("El grafo no es conexo. No se pudo generar un MST completo.");
-        }
-        
-        for (Edge e : mst) {
-            System.out.println(" - " + e);
-            pesoTotal += e.getWeight();
-        }
-        System.out.println("Peso total del árbol: " + pesoTotal);
+        printMSTResult("Kruskal", mst); // Usar nuevo método para imprimir resultados
+        return mst;
+
+
     }
 }
