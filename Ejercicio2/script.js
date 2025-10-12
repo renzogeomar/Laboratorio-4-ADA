@@ -77,7 +77,41 @@ class UnionFind { // Mantiene conjuntos disjuntos de nodos
     }
 }
 
+// --- FUNCIONES DE DIBUJO ---
+function drawGraph() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    edges.forEach(edge => {
+        ctx.beginPath();
+        ctx.moveTo(edge.from.x, edge.from.y);
+        ctx.lineTo(edge.to.x, edge.to.y);
+        ctx.strokeStyle = edge.color;
+        ctx.lineWidth = (edge.color === COLORS.EDGE_MST || edge.color === COLORS.EDGE_CONSIDERING) ? 3 : 2;
+        ctx.stroke();
+
+        const midX = (edge.from.x + edge.to.x) / 2;
+        const midY = (edge.from.y + edge.to.y) / 2;
+        ctx.fillStyle = '#000';
+        ctx.font = '14px Arial';
+        ctx.fillText(edge.weight, midX + 5, midY - 5);
+    });
+
+    nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 15, 0, 2 * Math.PI);
+        ctx.fillStyle = node.color;
+        ctx.fill();
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = COLORS.TEXT;
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(node.name, node.x, node.y);
+    });
+}
 
 // LÓGICA DEL GRAFO 
 function generarGrafoAleatorio() {
@@ -310,3 +344,16 @@ function finalizarKruskal() {
 }
 
 
+// --- LOGGING Y EVENT LISTENERS ---
+function logMessage(msg, clear = false) {
+    if (clear) logMessages.innerHTML = '';
+    logMessages.innerHTML += `> ${msg}\n`;
+    logMessages.scrollTop = logMessages.scrollHeight;
+}
+
+btnGenerate.addEventListener('click', generarGrafoAleatorio);
+btnRunPrim.addEventListener('click', () => prepararAlgoritmo('prim'));
+btnRunKruskal.addEventListener('click', () => prepararAlgoritmo('kruskal'));
+btnNext.addEventListener('click', siguientePaso);
+
+window.onload = generarGrafoAleatorio;
