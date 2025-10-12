@@ -78,7 +78,8 @@ class UnionFind { // Mantiene conjuntos disjuntos de nodos
 }
 
 
-// --- LÓGICA DEL GRAFO ---
+
+// LÓGICA DEL GRAFO 
 function generarGrafoAleatorio() {
     const cantidadNodos = parseInt(nodeCountInput.value);
     const cantidadAristas = parseInt(edgeCountInput.value);
@@ -87,14 +88,14 @@ function generarGrafoAleatorio() {
     edges = [];
     activeAlgorithm = null;
     
-    for (let i = 0; i < cantidadNodos; i++) {
+    for (let i = 0; i < cantidadNodos; i++) { // Crear nodos en posiciones aleatorias
         const x = Math.random() * (canvas.width - 60) + 30;
         const y = Math.random() * (canvas.height - 60) + 30;
         nodes.push(new Node('N' + i, x, y));
     }
 
-    const edgeSet = new Set();
-    while (edges.length < cantidadAristas && edges.length < (cantidadNodos * (cantidadNodos - 1)) / 2) {
+    const edgeSet = new Set(); // Para evitar aristas duplicadas
+    while (edges.length < cantidadAristas && edges.length < (cantidadNodos * (cantidadNodos - 1)) / 2) { // Máximo de aristas en un grafo simple
         let i = Math.floor(Math.random() * cantidadNodos);
         let j = Math.floor(Math.random() * cantidadNodos);
         if (i === j) continue;
@@ -111,5 +112,43 @@ function generarGrafoAleatorio() {
     btnRunPrim.disabled = false;
     btnRunKruskal.disabled = false;
     btnNext.disabled = true;
+}
+
+function resetGraphColors() { // Resetea los colores de nodos y aristas
+    nodes.forEach(n => n.color = COLORS.NODE_DEFAULT);
+    edges.forEach(e => e.color = COLORS.EDGE_DEFAULT);
+}
+
+// LÓGICA DE LOS ALGORITMOS (PASO A PASO) 
+
+function prepararAlgoritmo(type) {
+    if (nodes.length === 0) {
+        logMessage("Error: No hay nodos en el grafo.", true);
+        return;
+    }
+    resetGraphColors();
+    activeAlgorithm = type;
+    logMessage(`Iniciando algoritmo de ${type}...`, true);
+    
+    if (type === 'prim') {
+        iniciarPrim();
+    } 
+    else if (type === 'kruskal') {
+        iniciarKruskal();
+    }
+
+    btnRunPrim.disabled = true;
+    btnRunKruskal.disabled = true;
+    btnNext.disabled = false;
+    drawGraph();
+}
+
+function siguientePaso() { // Ejecuta el siguiente paso del algoritmo activo
+    if (activeAlgorithm === 'prim') {
+        siguientePasoPrim();
+    } 
+    else if (activeAlgorithm === 'kruskal') {
+        siguientePasoKruskal();
+    }
 }
 
