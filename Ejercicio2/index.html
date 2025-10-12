@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador del Algoritmo de Prim</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Visualizador de algoritmos Prim y Kruskal</h1>
+    <div class="container">
+        <canvas id="graphCanvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <h2>Controles</h2>
+            <div class="input-group">
+                <label for="nodeCount">Nodos:</label>
+                <input type="number" id="nodeCount" value="8" min="2" max="50">
+            </div>
+            <div class="input-group">
+                <label for="edgeCount">Aristas:</label>
+                <input type="number" id="edgeCount" value="15" min="1" max="100">
+            </div>
+            <button id="btn-generate">Generar Grafo Aleatorio</button>
+            <hr>
+            <button id="btn-run-prim">Iniciar Prim (Paso a Paso)</button>
+            <button id="btn-run-kruskal">Iniciar Kruskal (Paso a Paso)</button>
+            <hr>
+            <button id="btn-next" disabled>Siguiente Paso</button>
+            <div id="log-panel">
+                <h3>Pasos del Algoritmo:</h3>
+                <div id="log-messages"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
