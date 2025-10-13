@@ -1,5 +1,3 @@
-package Ejercicio4_1;
-
 import java.util.*;
 
 public class Graph {

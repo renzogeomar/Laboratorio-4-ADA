@@ -1,4 +1,4 @@
-package Ejercicio3;
+package Ejercicio5;
 
 public class Edge {
     private Node from;
