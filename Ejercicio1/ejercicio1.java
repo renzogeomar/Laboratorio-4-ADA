@@ -7,8 +7,5 @@ public class ejercicio1 {
         graph.showGraph();
         graph.prim("N0");
     }
-
-
-
 }
 

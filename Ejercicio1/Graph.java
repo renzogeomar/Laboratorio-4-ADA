@@ -105,6 +105,7 @@ public class Graph {
 
         List<Node> visited = new ArrayList<>();
         List<Edge> mst = new ArrayList<>();
+        int aristasProcesadas = 0;
 
         visited.add(start);
 
@@ -119,6 +120,8 @@ public class Graph {
 
                 if ((visited.contains(from) && !visited.contains(to)) ||
                     (visited.contains(to) && !visited.contains(from))) {
+
+                        aristasProcesadas++;
 
                     if (minEdge == null || weight < minEdge.getWeight()) {
                         minEdge = e;
@@ -149,5 +152,7 @@ public class Graph {
             pesoTotal += e.getWeight();
         }
         System.out.println("Peso total del árbol: " + pesoTotal);
+        System.out.println("Número de aristas procesadas: " + aristasProcesadas);
+
     }
 }
